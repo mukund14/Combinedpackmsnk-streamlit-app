@@ -34,7 +34,11 @@ def main():
             ["None", "Statistical Analysis", "Machine Learning", "Clustering", "PCA"]
         )
 
-        analysis_params = {}
+        ml_task = None
+        model = None
+        clustering_model = None
+        n_components = None
+
         if analysis == "Machine Learning":
             ml_task = st.sidebar.radio("Select Task", ["Classification", "Regression"])
             if ml_task == "Classification":
@@ -47,29 +51,41 @@ def main():
                     "Select Model",
                     ["Random Forest", "Linear Regression", "Support Vector Machine", "Gradient Boosting", "AdaBoost", "XGBoost"]
                 )
-            analysis_params['ml_task'] = ml_task
-            analysis_params['model'] = model
 
         if analysis == "Clustering":
             clustering_model = st.sidebar.selectbox("Select Clustering Model", ["KMeans", "DBSCAN"])
-            analysis_params['clustering_model'] = clustering_model
 
         if analysis == "PCA":
             n_components = st.sidebar.number_input("Number of Components for PCA", min_value=1, max_value=10, value=2)
-            analysis_params['n_components'] = n_components
 
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
 
+            # Prepare parameters for func
+            func_params = {
+                'file_loc': "temp_uploaded_file.csv",
+                'header_row_number': header_row,
+            }
+            if target:
+                func_params['target'] = target
+            if id_col:
+                func_params['id_col'] = id_col
+            if scaling_option:
+                func_params['scaling_option'] = scaling_option
+            if ml_task:
+                func_params['ml_task'] = ml_task
+            if model:
+                func_params['model'] = model
+            if analysis:
+                func_params['analysis'] = analysis
+            if clustering_model:
+                func_params['clustering_model'] = clustering_model
+            if n_components:
+                func_params['n_components'] = n_components
+
             # Call the function from the package with the necessary parameters
             try:
-                results = func(
-                    "temp_uploaded_file.csv",
-                    header_row_number=header_row,
-                    target=target,
-                    id_col=id_col,
-                    **analysis_params
-                )
+                results = func(**func_params)
                 st.write("Results:")
                 st.write(results)
             except TypeError as e:
