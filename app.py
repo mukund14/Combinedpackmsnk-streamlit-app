@@ -16,11 +16,20 @@ def main():
         with open("temp_uploaded_file.csv", "wb") as f:
             f.write(uploaded_file.getbuffer())
 
+        df = pd.read_csv("temp_uploaded_file.csv", header=header_row)
+        
+        # Display the top 3 rows of the DataFrame
+        st.write("Top 3 rows of the dataset:")
+        st.write(df.head(3))
+
         st.sidebar.subheader("Data Preprocessing")
         preprocess = st.sidebar.checkbox("Preprocess Data")
 
+        target = st.sidebar.selectbox("Select Target Variable", df.columns)
+        id_col = st.sidebar.text_input("ID Column (leave blank if none)", "")
+
         if preprocess:
-            st.sidebar.write("Data will be preprocessed...")
+            scaling_option = st.sidebar.radio("Choose a scaler", ["StandardScaler", "MinMaxScaler", "None"])
 
         st.sidebar.subheader("Choose Analysis")
         analysis = st.sidebar.selectbox(
@@ -29,12 +38,6 @@ def main():
         )
 
         model = None
-        target = None
-        id_col = None
-        scaling_option = None
-        if analysis == "Statistical Analysis":
-            st.subheader("Statistical Analysis")
-        
         if analysis == "Machine Learning":
             ml_task = st.sidebar.radio("Select Task", ["Classification", "Regression"])
             if ml_task == "Classification":
@@ -47,17 +50,12 @@ def main():
                     "Select Model",
                     ["Random Forest", "Linear Regression", "Support Vector Machine", "Gradient Boosting", "AdaBoost", "XGBoost"]
                 )
-            target = st.sidebar.selectbox("Select Target Variable", [])
-            id_col = st.sidebar.text_input("ID Column (leave blank if none)", "")
 
         if analysis == "Clustering":
             clustering_model = st.sidebar.selectbox("Select Clustering Model", ["KMeans", "DBSCAN"])
 
         if analysis == "PCA":
             n_components = st.sidebar.number_input("Number of Components for PCA", min_value=1, max_value=10, value=2)
-
-        if preprocess:
-            scaling_option = st.sidebar.radio("Choose a scaler", ["StandardScaler", "MinMaxScaler", "None"])
 
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
