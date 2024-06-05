@@ -1,6 +1,33 @@
 import streamlit as st
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from combinedpackmsnk import func
+
+def preprocess_data(df, target, id_col, scaling_option):
+    # Encode categorical variables
+    label_encoders = {}
+    for col in df.select_dtypes(include=['object']).columns:
+        label_encoders[col] = LabelEncoder()
+        df[col] = label_encoders[col].fit_transform(df[col].astype(str))
+
+    # Handle missing values
+    df = df.fillna(df.mean())  # Fill numeric columns with mean
+    df = df.fillna(df.mode().iloc[0])  # Fill categorical columns with mode
+
+    # Apply scaling
+    if scaling_option == "StandardScaler":
+        scaler = StandardScaler()
+    elif scaling_option == "MinMaxScaler":
+        scaler = MinMaxScaler()
+    else:
+        scaler = None
+
+    if scaler:
+        features = df.drop(columns=[target, id_col]) if id_col else df.drop(columns=[target])
+        scaled_features = scaler.fit_transform(features)
+        df[features.columns] = scaled_features
+
+    return df
 
 def main():
     st.title("combinedpackmsnk: Data Analysis and Machine Learning")
@@ -12,9 +39,6 @@ def main():
     if uploaded_file is not None:
         # Read the uploaded file
         df = pd.read_csv(uploaded_file, header=header_row)
-
-        # Save the uploaded file temporarily to pass to the func method
-        df.to_csv("temp_uploaded_file.csv", index=False)
 
         # Display the first 5 rows of the dataset
         st.write("First 5 rows of the dataset:")
@@ -66,15 +90,7 @@ def main():
 
             # Preprocess the dataframe as needed before passing it to the func function
             if preprocess:
-                if scaling_option == "StandardScaler":
-                    scaler = StandardScaler()
-                elif scaling_option == "MinMaxScaler":
-                    scaler = MinMaxScaler()
-                else:
-                    scaler = None
-
-                if scaler:
-                    df[df.columns.difference([target, id_col])] = scaler.fit_transform(df[df.columns.difference([target, id_col])])
+                df = preprocess_data(df, target, id_col, scaling_option)
 
             # Save the preprocessed file temporarily
             df.to_csv("temp_uploaded_file.csv", index=False)
