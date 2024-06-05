@@ -10,6 +10,7 @@ def main():
     header_row = st.sidebar.number_input("Header Row Number", min_value=0, value=0, step=1)
 
     if uploaded_file is not None:
+        # Read the uploaded file as a pandas DataFrame
         df = pd.read_csv(uploaded_file, header=header_row)
         st.write("Data Preview:")
         st.write(df.head())
@@ -48,7 +49,8 @@ def main():
             st.write(f"Target Variable: {target}")
 
             if st.sidebar.button("Run Analysis"):
-                results = func(uploaded_file, header_row_number=header_row)
+                # Call the function from the package with the DataFrame directly
+                results = func(df)
                 st.write("Results:")
                 st.write(results)
 
@@ -57,7 +59,7 @@ def main():
             st.write(f"Selected Clustering Model: {clustering_model}")
 
             if st.sidebar.button("Run Clustering"):
-                results = func(uploaded_file, header_row_number=header_row)
+                results = func(df)
                 st.write("Results:")
                 st.write(results)
 
@@ -66,7 +68,7 @@ def main():
             st.write(f"Number of Components for PCA: {n_components}")
 
             if st.sidebar.button("Run PCA"):
-                results = func(uploaded_file, header_row_number=header_row)
+                results = func(df)
                 st.write("Results:")
                 st.write(results)
 
