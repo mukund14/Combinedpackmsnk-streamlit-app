@@ -34,10 +34,7 @@ def main():
             ["None", "Statistical Analysis", "Machine Learning", "Clustering", "PCA"]
         )
 
-        model = None
-        clustering_model = None
-        n_components = None
-
+        analysis_params = {}
         if analysis == "Machine Learning":
             ml_task = st.sidebar.radio("Select Task", ["Classification", "Regression"])
             if ml_task == "Classification":
@@ -50,28 +47,28 @@ def main():
                     "Select Model",
                     ["Random Forest", "Linear Regression", "Support Vector Machine", "Gradient Boosting", "AdaBoost", "XGBoost"]
                 )
+            analysis_params['ml_task'] = ml_task
+            analysis_params['model'] = model
 
         if analysis == "Clustering":
             clustering_model = st.sidebar.selectbox("Select Clustering Model", ["KMeans", "DBSCAN"])
+            analysis_params['clustering_model'] = clustering_model
 
         if analysis == "PCA":
             n_components = st.sidebar.number_input("Number of Components for PCA", min_value=1, max_value=10, value=2)
+            analysis_params['n_components'] = n_components
 
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
 
-            # Call the function from the package with the temporary file path
+            # Call the function from the package with the necessary parameters
             try:
                 results = func(
                     "temp_uploaded_file.csv",
                     header_row_number=header_row,
-                    model=model,
                     target=target,
                     id_col=id_col,
-                    scaling_option=scaling_option,
-                    analysis=analysis,
-                    clustering_model=clustering_model,
-                    n_components=n_components
+                    **analysis_params
                 )
                 st.write("Results:")
                 st.write(results)
