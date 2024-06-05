@@ -61,19 +61,22 @@ def main():
             st.write("Running analysis...")
 
             # Call the function from the package with the temporary file path
-            results = func(
-                "temp_uploaded_file.csv",
-                header_row_number=header_row,
-                model=model,
-                target=target,
-                id_col=id_col,
-                scaling_option=scaling_option,
-                analysis=analysis,
-                clustering_model=clustering_model,
-                n_components=n_components
-            )
-            st.write("Results:")
-            st.write(results)
+            try:
+                results = func(
+                    "temp_uploaded_file.csv",
+                    header_row_number=header_row,
+                    model=model,
+                    target=target,
+                    id_col=id_col,
+                    scaling_option=scaling_option,
+                    analysis=analysis,
+                    clustering_model=clustering_model,
+                    n_components=n_components
+                )
+                st.write("Results:")
+                st.write(results)
+            except TypeError as e:
+                st.error(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
