@@ -13,6 +13,9 @@ def main():
         # Read the uploaded file
         df = pd.read_csv(uploaded_file, header=header_row)
 
+        # Save the uploaded file temporarily to pass to the func method
+        df.to_csv("temp_uploaded_file.csv", index=False)
+
         # Display the first 5 rows of the dataset
         st.write("First 5 rows of the dataset:")
         st.write(df.head(5))
@@ -61,31 +64,24 @@ def main():
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
 
-            # Prepare parameters for func
-            func_params = {
-                'file_loc': "temp_uploaded_file.csv",
-                'header_row_number': header_row,
-            }
-            if target:
-                func_params['target'] = target
-            if id_col:
-                func_params['id_col'] = id_col
-            if scaling_option:
-                func_params['scaling_option'] = scaling_option
-            if ml_task:
-                func_params['ml_task'] = ml_task
-            if model:
-                func_params['model'] = model
-            if analysis:
-                func_params['analysis'] = analysis
-            if clustering_model:
-                func_params['clustering_model'] = clustering_model
-            if n_components:
-                func_params['n_components'] = n_components
+            # Preprocess the dataframe as needed before passing it to the func function
+            if preprocess:
+                if scaling_option == "StandardScaler":
+                    scaler = StandardScaler()
+                elif scaling_option == "MinMaxScaler":
+                    scaler = MinMaxScaler()
+                else:
+                    scaler = None
+
+                if scaler:
+                    df[df.columns.difference([target, id_col])] = scaler.fit_transform(df[df.columns.difference([target, id_col])])
+
+            # Save the preprocessed file temporarily
+            df.to_csv("temp_uploaded_file.csv", index=False)
 
             # Call the function from the package with the necessary parameters
             try:
-                results = func(**func_params)
+                results = func("temp_uploaded_file.csv", header_row_number=header_row)
                 st.write("Results:")
                 st.write(results)
             except TypeError as e:
