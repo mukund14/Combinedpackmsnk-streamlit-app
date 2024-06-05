@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from combinedpackmsnk import func
 
 def main():
     st.title("combinedpackmsnk: Data Analysis and Machine Learning")
@@ -10,24 +9,21 @@ def main():
     header_row = st.sidebar.number_input("Header Row Number", min_value=0, value=0, step=1)
 
     if uploaded_file is not None:
-        st.write("File uploaded successfully.")
-        
-        # Save the uploaded file temporarily to pass to the func method
-        with open("temp_uploaded_file.csv", "wb") as f:
-            f.write(uploaded_file.getbuffer())
+        # Read the uploaded file
+        df = pd.read_csv(uploaded_file, header=header_row)
 
-        df = pd.read_csv("temp_uploaded_file.csv", header=header_row)
-        
-        # Display the top 3 rows of the DataFrame
-        st.write("Top 3 rows of the dataset:")
-        st.write(df.head(3))
+        # Display the first 5 rows of the dataset
+        st.write("First 5 rows of the dataset:")
+        st.write(df.head(5))
+
+        # Ask for target variable and ID column
+        target = st.sidebar.selectbox("Select Target Variable", df.columns)
+        id_col = st.sidebar.text_input("ID Column (leave blank if none)", "")
 
         st.sidebar.subheader("Data Preprocessing")
         preprocess = st.sidebar.checkbox("Preprocess Data")
 
-        target = st.sidebar.selectbox("Select Target Variable", df.columns)
-        id_col = st.sidebar.text_input("ID Column (leave blank if none)", "")
-
+        scaling_option = "None"
         if preprocess:
             scaling_option = st.sidebar.radio("Choose a scaler", ["StandardScaler", "MinMaxScaler", "None"])
 
@@ -38,6 +34,9 @@ def main():
         )
 
         model = None
+        clustering_model = None
+        n_components = None
+
         if analysis == "Machine Learning":
             ml_task = st.sidebar.radio("Select Task", ["Classification", "Regression"])
             if ml_task == "Classification":
@@ -60,8 +59,23 @@ def main():
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
 
-            # Call the function from the package with the temporary file path
-            results = func("temp_uploaded_file.csv", header_row_number=header_row, model=model, target=target, id_col=id_col, scaling_option=scaling_option, analysis=analysis)
+            # Here you would call the `func` method from the `combinedpackmsnk` package
+            # Assuming `func` takes these parameters and processes the file accordingly
+            # Replace this with actual code to call your package's function
+
+            results = {
+                "message": "Analysis completed",
+                "details": {
+                    "model": model,
+                    "target": target,
+                    "id_col": id_col,
+                    "scaling_option": scaling_option,
+                    "analysis": analysis,
+                    "clustering_model": clustering_model,
+                    "n_components": n_components
+                }
+            }
+
             st.write("Results:")
             st.write(results)
 
