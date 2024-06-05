@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from combinedpackmsnk import func
 
 def main():
     st.title("combinedpackmsnk: Data Analysis and Machine Learning")
@@ -59,23 +60,18 @@ def main():
         if st.sidebar.button("Run Analysis"):
             st.write("Running analysis...")
 
-            # Here you would call the `func` method from the `combinedpackmsnk` package
-            # Assuming `func` takes these parameters and processes the file accordingly
-            # Replace this with actual code to call your package's function
-
-            results = {
-                "message": "Analysis completed",
-                "details": {
-                    "model": model,
-                    "target": target,
-                    "id_col": id_col,
-                    "scaling_option": scaling_option,
-                    "analysis": analysis,
-                    "clustering_model": clustering_model,
-                    "n_components": n_components
-                }
-            }
-
+            # Call the function from the package with the temporary file path
+            results = func(
+                "temp_uploaded_file.csv",
+                header_row_number=header_row,
+                model=model,
+                target=target,
+                id_col=id_col,
+                scaling_option=scaling_option,
+                analysis=analysis,
+                clustering_model=clustering_model,
+                n_components=n_components
+            )
             st.write("Results:")
             st.write(results)
 
